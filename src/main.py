@@ -1,4 +1,6 @@
 import secrets
+import time
+from typing import Dict
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
 from src.database import engine, get_db
@@ -12,7 +14,8 @@ from src.config import (
     PEPPER_SECRET,
     LOCKOUT,
     LOCKOUT_THRESHOLD,
-    CAPTCHA
+    CAPTCHA,
+    CAPTCHA_TOKEN_EXPIRY
 )
 
 Base.metadata.create_all(bind=engine)
@@ -20,6 +23,8 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI()
 
 app.add_middleware(LoginLoggerMiddleware)
+
+captcha_tokens: Dict[str, float] = {}
 
 
 @app.post("/register")
@@ -86,6 +91,15 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
 
 
 async def verify_captcha(token: str) -> bool:
+    if not token:
+        return False
+    if token not in captcha_tokens:
+        return False
+    expiry_time = captcha_tokens[token]
+    if time.time() > expiry_time:
+        del captcha_tokens[token]
+        return False
+    del captcha_tokens[token]
     return True
 
 
@@ -96,4 +110,7 @@ async def login_totp():
 
 @app.get("/admin/get_captcha_token")
 async def get_captcha_token():
-    pass
+    token = secrets.token_urlsafe(32)
+    expiry_time = time.time() + CAPTCHA_TOKEN_EXPIRY
+    captcha_tokens[token] = expiry_time
+    return {"captcha_token": token}

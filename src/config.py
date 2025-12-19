@@ -16,4 +16,5 @@ RATE_LIMIT = os.getenv("RATE_LIMIT", "false").lower() == "true"
 LOCKOUT = os.getenv("LOCKOUT", "false").lower() == "true"
 LOCKOUT_THRESHOLD = 3
 CAPTCHA = os.getenv("CAPTCHA", "false").lower() == "true"
+CAPTCHA_TOKEN_EXPIRY = 300
 PEPPER = os.getenv("PEPPER", "false").lower() == "true"
