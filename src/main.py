@@ -6,7 +6,14 @@ from src.models import Base, User
 from src.schemas import RegisterRequest, LoginRequest
 from src.middleware import LoginLoggerMiddleware
 from src.auth_utils import hash_password, verify_password
-from src.config import HASH_MODE, PEPPER, PEPPER_SECRET, LOCKOUT, CAPTCHA
+from src.config import (
+    HASH_MODE,
+    PEPPER,
+    PEPPER_SECRET,
+    LOCKOUT,
+    LOCKOUT_THRESHOLD,
+    CAPTCHA
+)
 
 Base.metadata.create_all(bind=engine)
 
@@ -48,7 +55,7 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
-    if LOCKOUT and user.failed_attempts >= 5:
+    if LOCKOUT and user.failed_attempts >= LOCKOUT_THRESHOLD:
         raise HTTPException(
             status_code=403, detail="Account locked due to too many failed attempts"
         )
