@@ -4,7 +4,8 @@ from typing import Literal, cast
 
 load_dotenv()
 
-GROUP_SEED = int(os.getenv("GROUP_SEED", "1170596"))
+# Tehila and Michael group
+GROUP_SEED = int(os.getenv("GROUP_SEED", "1170596"))  
 PEPPER_SECRET = os.getenv("PEPPER_SECRET", "")
 
 HASH_MODE_STR = os.getenv("HASH_MODE", "SHA256")
