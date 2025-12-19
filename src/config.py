@@ -13,6 +13,8 @@ HASH_MODE: Literal["SHA256", "BCRYPT", "ARGON2ID"] = cast(
 )
 
 RATE_LIMIT = os.getenv("RATE_LIMIT", "false").lower() == "true"
+RATE_LIMIT_MAX_ATTEMPTS = 5
+RATE_LIMIT_WINDOW_SECONDS = 60
 LOCKOUT = os.getenv("LOCKOUT", "false").lower() == "true"
 LOCKOUT_THRESHOLD = 3
 CAPTCHA = os.getenv("CAPTCHA", "false").lower() == "true"

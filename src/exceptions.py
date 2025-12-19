@@ -20,3 +20,7 @@ class CaptchaRequiredError(SecurityException):
 
 class InvalidCaptchaError(SecurityException):
     """Raised when CAPTCHA token is invalid or expired."""
+
+
+class RateLimitExceededError(SecurityException):
+    """Raised when rate limit is exceeded for login attempts."""

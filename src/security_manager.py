@@ -9,7 +9,8 @@ from src.exceptions import (
     InvalidCredentialsError,
     AccountLockedError,
     CaptchaRequiredError,
-    InvalidCaptchaError
+    InvalidCaptchaError,
+    RateLimitExceededError
 )
 from src.config import (
     HASH_MODE,
@@ -18,10 +19,15 @@ from src.config import (
     LOCKOUT,
     LOCKOUT_THRESHOLD,
     CAPTCHA,
-    CAPTCHA_TOKEN_EXPIRY
+    CAPTCHA_TOKEN_EXPIRY,
+    RATE_LIMIT,
+    RATE_LIMIT_MAX_ATTEMPTS,
+    RATE_LIMIT_WINDOW_SECONDS
 )
 
 captcha_tokens: Dict[str, float] = {}
+rate_limit_attempts: Dict[str, list] = {}
+simulation_tokens: Dict[str, float] = {}
 
 
 def prepare_password(password: str) -> str:
@@ -80,8 +86,14 @@ def validate_captcha(captcha_token: Optional[str]) -> None:
 
 
 def authenticate_user(
-    username: str, password: str, captcha_token: Optional[str], db: Session
+    username: str,
+    password: str,
+    captcha_token: Optional[str],
+    db: Session,
+    simulation_token: Optional[str] = None
 ) -> User:
+    check_rate_limit(username, simulation_token)
+
     user = db.query(User).filter(User.username == username).first()
     if not user:
         raise InvalidCredentialsError("Invalid username or password")
@@ -121,3 +133,47 @@ def verify_captcha_token(token: str) -> bool:
         return False
     del captcha_tokens[token]
     return True
+
+
+def generate_simulation_token() -> str:
+    token = secrets.token_urlsafe(32)
+    expiry_time = time.time() + 3600
+    simulation_tokens[token] = expiry_time
+    return token
+
+
+def verify_simulation_token(token: Optional[str]) -> bool:
+    if not token:
+        return False
+    if token not in simulation_tokens:
+        return False
+    expiry_time = simulation_tokens[token]
+    if time.time() > expiry_time:
+        del simulation_tokens[token]
+        return False
+    return True
+
+
+def check_rate_limit(identifier: str, simulation_token: Optional[str]) -> None:
+    if not RATE_LIMIT:
+        return
+
+    if verify_simulation_token(simulation_token):
+        return
+
+    current_time = time.time()
+    window_start = current_time - RATE_LIMIT_WINDOW_SECONDS
+
+    if identifier not in rate_limit_attempts:
+        rate_limit_attempts[identifier] = []
+
+    rate_limit_attempts[identifier] = [
+        t for t in rate_limit_attempts[identifier] if t > window_start
+    ]
+
+    if len(rate_limit_attempts[identifier]) >= RATE_LIMIT_MAX_ATTEMPTS:
+        raise RateLimitExceededError(
+            f"Rate limit exceeded. Try again in {RATE_LIMIT_WINDOW_SECONDS} seconds"
+        )
+
+    rate_limit_attempts[identifier].append(current_time)

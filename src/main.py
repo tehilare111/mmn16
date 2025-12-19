@@ -7,14 +7,16 @@ from src.middleware import LoginLoggerMiddleware
 from src.security_manager import (
     register_user,
     authenticate_user,
-    generate_captcha_token
+    generate_captcha_token,
+    generate_simulation_token
 )
 from src.exceptions import (
     UserAlreadyExistsError,
     InvalidCredentialsError,
     AccountLockedError,
     CaptchaRequiredError,
-    InvalidCaptchaError
+    InvalidCaptchaError,
+    RateLimitExceededError
 )
 
 Base.metadata.create_all(bind=engine)
@@ -43,9 +45,12 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
             request.username,
             request.password,
             request.captcha_token,
-            db
+            db,
+            request.simulation_token
         )
         return {"message": "Login successful", "username": user.username}
+    except RateLimitExceededError as e:
+        raise HTTPException(status_code=429, detail=str(e)) from e
     except InvalidCredentialsError as e:
         raise HTTPException(status_code=401, detail=str(e)) from e
     except AccountLockedError as e:
@@ -63,3 +68,9 @@ async def login_totp():
 async def get_captcha_token():
     token = generate_captcha_token()
     return {"captcha_token": token}
+
+
+@app.get("/admin/get_simulation_token")
+async def get_simulation_token():
+    token = generate_simulation_token()
+    return {"simulation_token": token}
