@@ -24,3 +24,7 @@ class InvalidCaptchaError(SecurityException):
 
 class RateLimitExceededError(SecurityException):
     """Raised when rate limit is exceeded for login attempts."""
+
+
+class InvalidTotpError(SecurityException):
+    """Raised when TOTP code is invalid or expired."""

@@ -12,3 +12,11 @@ class LoginRequest(BaseModel):
     password: str
     captcha_token: Optional[str] = None
     simulation_token: Optional[str] = None
+
+
+class LoginTotpRequest(BaseModel):
+    username: str
+    password: str
+    totp_code: str
+    captcha_token: Optional[str] = None
+    simulation_token: Optional[str] = None

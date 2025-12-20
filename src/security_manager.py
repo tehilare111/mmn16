@@ -1,5 +1,6 @@
 import secrets
 import time
+import pyotp
 from typing import Dict, Optional
 from sqlalchemy.orm import Session
 from src.models import User
@@ -10,7 +11,8 @@ from src.exceptions import (
     AccountLockedError,
     CaptchaRequiredError,
     InvalidCaptchaError,
-    RateLimitExceededError
+    RateLimitExceededError,
+    InvalidTotpError
 )
 from src.config import (
     HASH_MODE,
@@ -22,7 +24,9 @@ from src.config import (
     CAPTCHA_TOKEN_EXPIRY,
     RATE_LIMIT,
     RATE_LIMIT_MAX_ATTEMPTS,
-    RATE_LIMIT_WINDOW_SECONDS
+    RATE_LIMIT_WINDOW_SECONDS,
+    TOTP,
+    TOTP_WINDOW
 )
 
 captcha_tokens: Dict[str, float] = {}
@@ -42,8 +46,12 @@ def generate_salt() -> Optional[str]:
     return None
 
 
+def generate_totp_secret() -> str:
+    return pyotp.random_base32()
+
+
 def register_user(
-    username: str, password: str, db: Session
+    username: str, password: str, db: Session, totp_secret: Optional[str] = None
 ) -> User:
     existing_user = db.query(User).filter(User.username == username).first()
     if existing_user:
@@ -53,10 +61,14 @@ def register_user(
     salt = generate_salt()
     hashed = hash_password(password_to_hash, salt=salt)
 
+    if not totp_secret: # in case it wasn't generated from the seeding script
+        totp_secret = generate_totp_secret()
+
     new_user = User(
         username=username,
         hashed_password=hashed,
         salt=salt,
+        totp_secret=totp_secret,
         failed_attempts=0
     )
 
@@ -177,3 +189,30 @@ def check_rate_limit(identifier: str, simulation_token: Optional[str]) -> None:
         )
 
     rate_limit_attempts[identifier].append(current_time)
+
+
+def verify_totp_code(secret: str, code: str) -> bool:
+    if not secret or not code:
+        return False
+    totp = pyotp.TOTP(secret)
+    return totp.verify(code, valid_window=TOTP_WINDOW)
+
+
+def authenticate_user_with_totp(
+    username: str,
+    password: str,
+    totp_code: str,
+    captcha_token: Optional[str],
+    db: Session,
+    simulation_token: Optional[str] = None
+) -> User:
+    user = authenticate_user(username, password, captcha_token, db, simulation_token)
+
+    if TOTP:
+        if not user.totp_secret:
+            raise InvalidTotpError("TOTP not configured for this user")
+
+        if not verify_totp_code(user.totp_secret, totp_code):
+            raise InvalidTotpError("Invalid TOTP code")
+
+    return user

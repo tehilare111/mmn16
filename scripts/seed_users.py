@@ -30,6 +30,7 @@ def seed_users():
         username = user_data["username"]
         password = user_data["password"]
         category = user_data["category"]
+        totp_secret = user_data.get("totp_secret")
 
         existing = db.query(User).filter(User.username == username).first()
         if existing:
@@ -38,7 +39,7 @@ def seed_users():
             continue
 
         try:
-            register_user(username, password, db)
+            register_user(username, password, db, totp_secret=totp_secret)
             print(f"  OK: {username} [{category}]")
             created += 1
         except Exception as e:

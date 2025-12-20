@@ -5,182 +5,211 @@
       "username": "weak_user_01",
       "password": "123456",
       "category": "weak",
-      "reason": "Most common password worldwide, purely numeric, only 6 characters"
+      "reason": "Most common password worldwide, purely numeric, only 6 characters",
+      "totp_secret": "RWYBJLDMIRAC3L2GABVQALCRAGMEXXQ2"
     },
     {
       "username": "weak_user_02",
       "password": "password",
       "category": "weak",
-      "reason": "Dictionary word, appears in top 10 most common passwords"
+      "reason": "Dictionary word, appears in top 10 most common passwords",
+      "totp_secret": "ME3BRVDA7LZWYUAL4VYBAT7VQAOXCIY2"
     },
     {
       "username": "weak_user_03",
       "password": "qwerty",
       "category": "weak",
-      "reason": "Keyboard pattern, extremely common, only 6 characters"
+      "reason": "Keyboard pattern, extremely common, only 6 characters",
+      "totp_secret": "3JV3NNCPADLWWS7MF3SQSKEMTI7V6EJA"
     },
     {
       "username": "weak_user_04",
       "password": "admin",
       "category": "weak",
-      "reason": "Common default credential, dictionary word, only 5 characters"
+      "reason": "Common default credential, dictionary word, only 5 characters",
+      "totp_secret": "2OZOXC63XBQKADZDFTRN6IB2S3YVOG64"
     },
     {
       "username": "weak_user_05",
       "password": "letmein",
       "category": "weak",
-      "reason": "Common phrase, appears in password breach databases"
+      "reason": "Common phrase, appears in password breach databases",
+      "totp_secret": "CJDJXHXVISO72VGXEU3OPBMLXGB77XU6"
     },
     {
       "username": "weak_user_06",
       "password": "welcome",
       "category": "weak",
-      "reason": "Dictionary word, commonly used as default password"
+      "reason": "Dictionary word, commonly used as default password",
+      "totp_secret": "C4665RR3E5MZ6MXN3JPQCDPOGVV7F4YE"
     },
     {
       "username": "weak_user_07",
       "password": "111111",
       "category": "weak",
-      "reason": "Repeated single digit, no complexity, easily guessable"
+      "reason": "Repeated single digit, no complexity, easily guessable",
+      "totp_secret": "FHCLN6YQAPWT6TVN42Y7S2B6KEJFKJYR"
     },
     {
       "username": "weak_user_08",
       "password": "abc123",
       "category": "weak",
-      "reason": "Simple sequential pattern, very common combination"
+      "reason": "Simple sequential pattern, very common combination",
+      "totp_secret": "54FVMDSGDNEC5XWTITRE44VAOZP2HN4P"
     },
     {
       "username": "weak_user_09",
       "password": "monkey",
       "category": "weak",
-      "reason": "Common word, appears in top 25 most used passwords"
+      "reason": "Common word, appears in top 25 most used passwords",
+      "totp_secret": "SF6HOULMSOGVR5CZEZXDA3EVFWFTT33G"
     },
     {
       "username": "weak_user_10",
       "password": "dragon",
       "category": "weak",
-      "reason": "Common word, frequently found in password breach lists"
+      "reason": "Common word, frequently found in password breach lists",
+      "totp_secret": "IUWDTY3J3WEITLHN6DYAFF727HQLPX2W"
     },
     {
       "username": "medium_user_01",
       "password": "Password123",
       "category": "medium",
-      "reason": "Common word with predictable capitalization and number suffix"
+      "reason": "Common word with predictable capitalization and number suffix",
+      "totp_secret": "QL663362XYEEFG4RVESWZEK6AM2MKDBX"
     },
     {
       "username": "medium_user_02",
       "password": "Summer2024!",
       "category": "medium",
-      "reason": "Seasonal word + year + symbol, predictable pattern"
+      "reason": "Seasonal word + year + symbol, predictable pattern",
+      "totp_secret": "S4PLCUU2KFKAAARXWBK4XLUNAQGOTUMS"
     },
     {
       "username": "medium_user_03",
       "password": "Admin@123",
       "category": "medium",
-      "reason": "Common word with symbol and numbers, follows typical policy pattern"
+      "reason": "Common word with symbol and numbers, follows typical policy pattern",
+      "totp_secret": "TWNG5LAV3UPTKPYOYC6ONULOZ473SDC5"
     },
     {
       "username": "medium_user_04",
       "password": "Qwerty123!",
       "category": "medium",
-      "reason": "Keyboard pattern with complexity additions, still predictable"
+      "reason": "Keyboard pattern with complexity additions, still predictable",
+      "totp_secret": "6FCV4LDFUBK6OLYQ4XWLHGO24L5IOIQM"
     },
     {
       "username": "medium_user_05",
       "password": "Welcome1!",
       "category": "medium",
-      "reason": "Dictionary word meeting minimum complexity requirements"
+      "reason": "Dictionary word meeting minimum complexity requirements",
+      "totp_secret": "ST66NZY2XD7GUCOF3RCLCSYEF76DAIFI"
     },
     {
       "username": "medium_user_06",
       "password": "P@ssw0rd",
       "category": "medium",
-      "reason": "Common leetspeak substitution, well-known pattern"
+      "reason": "Common leetspeak substitution, well-known pattern",
+      "totp_secret": "NUHBRW4QFPO6OQG4EXX7WS6NMEC7DTUL"
     },
     {
       "username": "medium_user_07",
       "password": "Sunshine99",
       "category": "medium",
-      "reason": "Common word with numbers, no special characters"
+      "reason": "Common word with numbers, no special characters",
+      "totp_secret": "BC7BCWMQS5LKXLLCBIXMRPTK4EJOJ6MB"
     },
     {
       "username": "medium_user_08",
       "password": "Michael1985",
       "category": "medium",
-      "reason": "Name + year pattern, vulnerable to targeted attacks"
+      "reason": "Name + year pattern, vulnerable to targeted attacks",
+      "totp_secret": "5S4ZPKZXRGDPFSQDDGQS3UZK5IMBWDXR"
     },
     {
       "username": "medium_user_09",
       "password": "Football#7",
       "category": "medium",
-      "reason": "Common interest word with symbol and number"
+      "reason": "Common interest word with symbol and number",
+      "totp_secret": "W7NXWR6TZ4KTDORJE7OEGXYPM3Y2LIVA"
     },
     {
       "username": "medium_user_10",
       "password": "January2024",
       "category": "medium",
-      "reason": "Month + year pattern, predictable temporal password"
+      "reason": "Month + year pattern, predictable temporal password",
+      "totp_secret": "CIOQFDHV3N45LUOUDRDW46MXTCYFYBVX"
     },
     {
       "username": "strong_user_01",
       "password": "xK9#mP2$vL5@nQ8!",
       "category": "strong",
-      "reason": "16 chars, random mix of upper/lower/numbers/symbols, no patterns"
+      "reason": "16 chars, random mix of upper/lower/numbers/symbols, no patterns",
+      "totp_secret": "PAGZ2EZZQAPLMLDNH4PV5E36Q2RNAYKE"
     },
     {
       "username": "strong_user_02",
       "password": "Tr0ub4dor&3#Horse",
       "category": "strong",
-      "reason": "17 chars, mixed case, numbers, symbols, no dictionary words"
+      "reason": "17 chars, mixed case, numbers, symbols, no dictionary words",
+      "totp_secret": "DGC4RPB7CMIGHS2SNCWF6VTFDU7NN6WU"
     },
     {
       "username": "strong_user_03",
       "password": "7Gh$kL9@mNpQ2#xZ",
       "category": "strong",
-      "reason": "16 chars, cryptographically random appearance, high entropy"
+      "reason": "16 chars, cryptographically random appearance, high entropy",
+      "totp_secret": "625XROPFOVXGAJQVBZSDPG4UO5W7SJY6"
     },
     {
       "username": "strong_user_04",
       "password": "Bv8*Wx3!Yz6@Qr1#",
       "category": "strong",
-      "reason": "16 chars, alternating character types, no recognizable patterns"
+      "reason": "16 chars, alternating character types, no recognizable patterns",
+      "totp_secret": "FNCZS7ONNGGH6RGS5EASJPVFFGIMMDPQ"
     },
     {
       "username": "strong_user_05",
       "password": "purple-tiger-quantum-45!",
       "category": "strong",
-      "reason": "24 chars passphrase, unrelated words, includes number and symbol"
+      "reason": "24 chars passphrase, unrelated words, includes number and symbol",
+      "totp_secret": "SZ7SVKETP2BO5NIQNOYQVY7XQCIABH5X"
     },
     {
       "username": "strong_user_06",
       "password": "Jf9$Kp2@Lm5#Nq8!Rv",
       "category": "strong",
-      "reason": "18 chars, random sequence, maximum character class diversity"
+      "reason": "18 chars, random sequence, maximum character class diversity",
+      "totp_secret": "2FYZ73DHFFPDZJXM7DQVTLAV53ANR4QF"
     },
     {
       "username": "strong_user_07",
       "password": "crystal-moon-delta-99#X",
       "category": "strong",
-      "reason": "23 chars passphrase with random suffix, high entropy"
+      "reason": "23 chars passphrase with random suffix, high entropy",
+      "totp_secret": "G6G6XHNAMTI3ORFKSCUDMFIOUP4DCE5M"
     },
     {
       "username": "strong_user_08",
       "password": "Ht4@Vx7#Cz1!Wp9$Ek3",
       "category": "strong",
-      "reason": "19 chars, no sequential patterns, all character classes"
+      "reason": "19 chars, no sequential patterns, all character classes",
+      "totp_secret": "3MJDKGKYMSALNADP76LUNRW7OX6WQN26"
     },
     {
       "username": "strong_user_09",
       "password": "binary-phoenix-craft-77!Z",
       "category": "strong",
-      "reason": "25 chars passphrase, uncommon word combination, mixed suffix"
+      "reason": "25 chars passphrase, uncommon word combination, mixed suffix",
+      "totp_secret": "WJEHDO6I4JGXUJTRKABQPIZ2V5S5VIRE"
     },
     {
       "username": "strong_user_10",
       "password": "Mq5#Yr8@Zk2!Bs6$Nv9#Pw",
       "category": "strong",
-      "reason": "22 chars, maximum complexity, cryptographically strong"
+      "reason": "22 chars, maximum complexity, cryptographically strong",
+      "totp_secret": "GGN3UQVNCP3Z3Y335GS4KVPRKNBWCI5E"
     }
   ]
 }
-

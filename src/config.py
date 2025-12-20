@@ -21,3 +21,5 @@ LOCKOUT_THRESHOLD = 3
 CAPTCHA = os.getenv("CAPTCHA", "false").lower() == "true"
 CAPTCHA_TOKEN_EXPIRY = 300
 PEPPER = os.getenv("PEPPER", "false").lower() == "true"
+TOTP = os.getenv("TOTP", "false").lower() == "true"
+TOTP_WINDOW = 1

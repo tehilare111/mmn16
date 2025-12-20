@@ -2,11 +2,12 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from src.database import engine, get_db
 from src.models import Base
-from src.schemas import RegisterRequest, LoginRequest
+from src.schemas import RegisterRequest, LoginRequest, LoginTotpRequest
 from src.middleware import LoginLoggerMiddleware
 from src.security_manager import (
     register_user,
     authenticate_user,
+    authenticate_user_with_totp,
     generate_captcha_token,
     generate_simulation_token
 )
@@ -16,7 +17,8 @@ from src.exceptions import (
     AccountLockedError,
     CaptchaRequiredError,
     InvalidCaptchaError,
-    RateLimitExceededError
+    RateLimitExceededError,
+    InvalidTotpError
 )
 
 Base.metadata.create_all(bind=engine)
@@ -60,8 +62,27 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
 
 
 @app.post("/login_totp")
-async def login_totp():
-    pass
+async def login_totp(request: LoginTotpRequest, db: Session = Depends(get_db)):
+    try:
+        user = authenticate_user_with_totp(
+            request.username,
+            request.password,
+            request.totp_code,
+            request.captcha_token,
+            db,
+            request.simulation_token
+        )
+        return {"message": "Login successful", "username": user.username}
+    except RateLimitExceededError as e:
+        raise HTTPException(status_code=429, detail=str(e)) from e
+    except InvalidCredentialsError as e:
+        raise HTTPException(status_code=401, detail=str(e)) from e
+    except AccountLockedError as e:
+        raise HTTPException(status_code=403, detail=str(e)) from e
+    except (CaptchaRequiredError, InvalidCaptchaError) as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except InvalidTotpError as e:
+        raise HTTPException(status_code=401, detail=str(e)) from e
 
 
 @app.get("/admin/get_captcha_token")
