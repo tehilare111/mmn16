@@ -2,10 +2,11 @@ import time
 import asyncio
 import pyotp
 import httpx
+import os
 from typing import Optional
 from tests.test_attacks import (
     GROUP_SEED, USER_PASSWORDS, USER_CATEGORIES, USER_SECRETS,
-    ALL_PASSWORDS, HASH_MODE, RATE_LIMIT_ENABLED, LOCKOUT_ENABLED,
+    HASH_MODE, RATE_LIMIT_ENABLED, LOCKOUT_ENABLED,
     CAPTCHA_ENABLED, PEPPER_ENABLED, TOTP_ENABLED, BASE_URL
 )
 from tests.client import make_login_attempt, HTTP_CLIENT_TIMEOUT_SECONDS, AttackException
@@ -17,6 +18,17 @@ from tests.reporting import (
 
 # Constants
 DEFAULT_RATE_LIMIT_DELAY: float = 0.0
+COMMON_PASSWORDS_FILE: str = "data/common_passwords.txt"
+
+
+# Load common password list
+def load_common_passwords() -> list:
+    passwords = []
+    file_path = COMMON_PASSWORDS_FILE
+    if os.path.exists(file_path):
+        with open(file_path, "r") as f:
+            passwords = [line.strip() for line in f if line.strip()]
+    return passwords
 
 
 # Custom Exceptions
@@ -27,6 +39,8 @@ class DatasetError(AttackException):
 
 async def brute_force_attack(
     target_username: str,
+    protection_flags: Optional[dict] = None,
+    hash_mode: Optional[str] = None,
     max_attempts: Optional[int] = None,
     rate_limit: float = DEFAULT_RATE_LIMIT_DELAY
 ) -> dict:
@@ -34,21 +48,26 @@ async def brute_force_attack(
     if not correct_password:
         return
 
-    passwords_to_try = [p for p in ALL_PASSWORDS if p != correct_password]
-    passwords_to_try.append(correct_password)
+    passwords_to_try = load_common_passwords()
 
     if max_attempts and max_attempts < len(passwords_to_try):
         passwords_to_try = passwords_to_try[:max_attempts]
 
-    protection_flags = {
-        "rate_limit": RATE_LIMIT_ENABLED,
-        "lockout": LOCKOUT_ENABLED,
-        "captcha": CAPTCHA_ENABLED,
-        "pepper": PEPPER_ENABLED,
-        "totp": TOTP_ENABLED
-    }
+    # Use passed protection flags or fall back to environment
+    if protection_flags is None:
+        protection_flags = {
+            "rate_limit": RATE_LIMIT_ENABLED,
+            "lockout": LOCKOUT_ENABLED,
+            "captcha": CAPTCHA_ENABLED,
+            "pepper": PEPPER_ENABLED,
+            "totp": TOTP_ENABLED
+        }
 
-    endpoint = "/login_totp" if TOTP_ENABLED else "/login"
+    # Use passed hash_mode or fall back to environment
+    if hash_mode is None:
+        hash_mode = HASH_MODE
+
+    endpoint = "/login_totp" if protection_flags["totp"] else "/login"
 
     results = []
     success = False
@@ -80,7 +99,7 @@ async def brute_force_attack(
                 "username": target_username,
                 "password": password,
                 "password_category": password_category,
-                "hash_mode": HASH_MODE,
+                "hash_mode": hash_mode,
                 "protection_flags": protection_flags.copy(),
                 "status_code": response.status_code,
                 "success": response.status_code == 200,
@@ -102,7 +121,7 @@ async def brute_force_attack(
     report = {
         "attack_type": "brute_force",
         "group_seed": GROUP_SEED,
-        "hash_mode": HASH_MODE,
+        "hash_mode": hash_mode,
         "protection_flags": protection_flags,
         "target_username": target_username,
         "target_category": USER_CATEGORIES.get(target_username, "unknown"),
@@ -114,7 +133,7 @@ async def brute_force_attack(
         "time_to_crack": round(time_to_crack, 2) if time_to_crack else None,
         "avg_latency_ms": round(calculate_average_latency(results), 2),
         "success_rate_by_category": calculate_success_rate_by_category(results),
-        "use_totp": TOTP_ENABLED,
+        "use_totp": protection_flags["totp"],
         "results": results
     }
 
