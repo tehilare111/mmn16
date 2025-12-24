@@ -70,7 +70,13 @@ def update_env_file(config: dict) -> None:
 
 def kill_existing_servers() -> None:
     try:
-        subprocess.run(["pkill", "-f", "uvicorn"], capture_output=True)
+        subprocess.run(["pkill", "-9", "-f", "uvicorn"], capture_output=True)
+        time.sleep(2.0)
+    except Exception:
+        pass
+    try:
+        subprocess.run(["lsof", "-ti", f":{SERVER_PORT}"], capture_output=True)
+        subprocess.run(["kill", "-9", "$(lsof -ti :{})".format(SERVER_PORT)], shell=True, capture_output=True)
         time.sleep(1.0)
     except Exception:
         pass
@@ -84,13 +90,28 @@ def start_server() -> subprocess.Popen:
         preexec_fn=os.setsid
     )
     time.sleep(SERVER_STARTUP_WAIT)
+    if process.poll() is not None:
+        stdout, stderr = process.communicate()
+        print(f"Server process exited early with code {process.returncode}")
+        if stderr:
+            print(f"Server stderr: {stderr.decode()}")
+        if stdout:
+            print(f"Server stdout: {stdout.decode()}")
     return process
 
 
-async def wait_for_server_ready() -> bool:
+async def wait_for_server_ready(process: Optional[subprocess.Popen] = None) -> bool:
     start_time = time.time()
     async with httpx.AsyncClient(timeout=5.0) as client:
         while time.time() - start_time < HEALTH_CHECK_TIMEOUT:
+            if process and process.poll() is not None:
+                stdout, stderr = process.communicate()
+                print(f"Server process died during health check with code {process.returncode}")
+                if stderr:
+                    print(f"Server stderr: {stderr.decode()}")
+                if stdout:
+                    print(f"Server stdout: {stdout.decode()}")
+                return False
             try:
                 response = await client.get(f"{BASE_URL}/admin/get_captcha_token")
                 if response.status_code in [200, 400, 404]:
@@ -98,17 +119,28 @@ async def wait_for_server_ready() -> bool:
             except Exception:
                 pass
             await asyncio.sleep(HEALTH_CHECK_INTERVAL)
+    if process:
+        try:
+            stdout = process.stdout.read() if process.stdout else b""
+            stderr = process.stderr.read() if process.stderr else b""
+            if stderr:
+                print(f"Server stderr after timeout: {stderr.decode()}")
+            if stdout:
+                print(f"Server stdout after timeout: {stdout.decode()}")
+        except Exception:
+            pass
     return False
 
 
 def stop_server(process: Optional[subprocess.Popen]) -> None:
     if process:
         try:
-            os.killpg(os.getpgid(process.pid), signal.SIGTERM)
+            os.killpg(os.getpgid(process.pid), signal.SIGKILL)
             process.wait(timeout=5)
         except Exception:
             pass
     kill_existing_servers()
+    time.sleep(2.0)
 
 
 def generate_configuration_matrix() -> list:
@@ -158,21 +190,21 @@ def generate_configuration_matrix() -> list:
 def generate_attack_plan() -> list:
     attacks = []
 
-    attacks.append({
-        "type": "brute_force",
-        "target": "weak_user_01",
-        "category": "weak"
-    })
-    attacks.append({
-        "type": "brute_force",
-        "target": "medium_user_01",
-        "category": "medium"
-    })
-    attacks.append({
-        "type": "brute_force",
-        "target": "strong_user_01",
-        "category": "strong"
-    })
+    # attacks.append({
+    #     "type": "brute_force",
+    #     "target": "weak_user_01",
+    #     "category": "weak"
+    # })
+    # attacks.append({
+    #     "type": "brute_force",
+    #     "target": "medium_user_01",
+    #     "category": "medium"
+    # })
+    # attacks.append({
+    #     "type": "brute_force",
+    #     "target": "strong_user_01",
+    #     "category": "strong"
+    # })
 
     weak_users = [f"weak_user_{i:02d}" for i in range(1, 11)]
     attacks.append({
@@ -298,7 +330,7 @@ async def main() -> None:
         server_process = start_server()
         print(f"Starting server...")
 
-        server_ready = await wait_for_server_ready()
+        server_ready = await wait_for_server_ready(server_process)
         if not server_ready:
             print("ERROR: Server failed to start!")
             log_entries.append("ERROR: Server failed to start")

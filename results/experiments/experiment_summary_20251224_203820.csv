@@ -1,0 +1,4 @@
+experiment_id,phase,config_description,hash_mode,rate_limit,lockout,captcha,pepper,totp,attack_type,target,target_category,success,total_attempts,time_to_crack,total_time_seconds,avg_latency_ms,attempts_per_second
+1,1,Phase 1: SHA256 - No protections,SHA256,False,False,False,False,False,brute_force,weak_user_01,weak,True,151,19.97,19.97,132.19,7.56
+2,1,Phase 1: SHA256 - No protections,SHA256,False,False,False,False,False,brute_force,medium_user_01,medium,True,311,42.13,42.13,135.46,7.38
+3,1,Phase 1: SHA256 - No protections,SHA256,False,False,False,False,False,brute_force,strong_user_01,strong,True,455,62.0,62.0,136.25,7.34

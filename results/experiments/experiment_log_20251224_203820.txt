@@ -1,0 +1,65 @@
+
+================================================================================
+Configuration 1/9: Phase 1: SHA256 - No protections
+Started at: 2025-12-24 20:29:48
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [1/54] brute_force - weak_user_01
+    Status: SUCCESS | Attempts: 151 | Time: 19.99s
+  [2/54] brute_force - medium_user_01
+    Status: SUCCESS | Attempts: 311 | Time: 42.14s
+  [3/54] brute_force - strong_user_01
+    Status: SUCCESS | Attempts: 455 | Time: 62.01s
+  [4/54] password_spraying - weak_group
+  [5/54] password_spraying - medium_group
+  [6/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 2/9: Phase 1: BCRYPT - No protections
+Started at: 2025-12-24 20:33:39
+Updated .env file
+ERROR: Server failed to start
+
+================================================================================
+Configuration 3/9: Phase 1: ARGON2ID - No protections
+Started at: 2025-12-24 20:34:14
+Updated .env file
+ERROR: Server failed to start
+
+================================================================================
+Configuration 4/9: Phase 2: ARGON2ID - PEPPER only
+Started at: 2025-12-24 20:34:49
+Updated .env file
+ERROR: Server failed to start
+
+================================================================================
+Configuration 5/9: Phase 2: ARGON2ID - RATE_LIMIT only
+Started at: 2025-12-24 20:35:24
+Updated .env file
+ERROR: Server failed to start
+
+================================================================================
+Configuration 6/9: Phase 2: ARGON2ID - LOCKOUT only
+Started at: 2025-12-24 20:35:59
+Updated .env file
+ERROR: Server failed to start
+
+================================================================================
+Configuration 7/9: Phase 2: ARGON2ID - CAPTCHA only
+Started at: 2025-12-24 20:36:34
+Updated .env file
+ERROR: Server failed to start
+
+================================================================================
+Configuration 8/9: Phase 2: ARGON2ID - TOTP only
+Started at: 2025-12-24 20:37:09
+Updated .env file
+ERROR: Server failed to start
+
+================================================================================
+Configuration 9/9: Phase 2: ARGON2ID - ALL protections
+Started at: 2025-12-24 20:37:45
+Updated .env file
+ERROR: Server failed to start

@@ -9,16 +9,16 @@ from tests.test_attacks import (
     HASH_MODE, RATE_LIMIT_ENABLED, LOCKOUT_ENABLED,
     CAPTCHA_ENABLED, PEPPER_ENABLED, TOTP_ENABLED, BASE_URL
 )
-from tests.client import make_login_attempt, HTTP_CLIENT_TIMEOUT_SECONDS
+from tests.client import make_login_attempt
 from tests.reporting import (
     calculate_success_rate_by_category, calculate_average_latency,
     print_attack_summary, save_attack_results
 )
 
 
-# Constants
+PASSWORD_SPRAYING_TIMEOUT_SECONDS: float = 120.0
 DEFAULT_RATE_LIMIT_DELAY: float = 0.0
-COMMON_PASSWORDS_FILE: str = "data/common_passwords.txt"
+COMMON_PASSWORDS_FILE: str = "data/common_passwords_test.txt"
 
 
 # Load common password list
@@ -66,13 +66,15 @@ async def password_spraying_attack(
     correct_password = None
     cracked_username = None
     start_time = time.time()
+    attempt_counter = 0
 
-    async with httpx.AsyncClient(timeout=HTTP_CLIENT_TIMEOUT_SECONDS) as client:
+    async with httpx.AsyncClient(timeout=PASSWORD_SPRAYING_TIMEOUT_SECONDS) as client:
         for idx, password in enumerate(passwords_to_try, 1):
             if success:
                 break
 
             for username in target_usernames:
+                attempt_counter += 1
                 password_category = "unknown"
                 for user, pwd in USER_PASSWORDS.items():
                     if pwd == password:
@@ -86,11 +88,20 @@ async def password_spraying_attack(
                         payload["totp_code"] = pyotp.TOTP(secret).now()
 
                 start = time.time()
-                response = await make_login_attempt(client, BASE_URL, endpoint, payload)
-                latency = (time.time() - start) * 1000
+                try:
+                    response = await make_login_attempt(client, BASE_URL, endpoint, payload)
+                    latency = (time.time() - start) * 1000
+                    status_code = response.status_code
+                    is_success = response.status_code == 200
+                    captcha_used = "captcha_token" in str(response.request.content) if hasattr(response, 'request') else False
+                except (httpx.TimeoutException, httpx.RequestError) as e:
+                    latency = (time.time() - start) * 1000
+                    status_code = -1
+                    is_success = False
+                    captcha_used = False
 
                 result = {
-                    "attempt": idx,
+                    "attempt": attempt_counter,
                     "timestamp": time.time(),
                     "group_seed": GROUP_SEED,
                     "username": username,
@@ -98,14 +109,14 @@ async def password_spraying_attack(
                     "password_category": password_category,
                     "hash_mode": hash_mode,
                     "protection_flags": protection_flags.copy(),
-                    "status_code": response.status_code,
-                    "success": response.status_code == 200,
+                    "status_code": status_code,
+                    "success": is_success,
                     "latency_ms": latency,
-                    "captcha_used": "captcha_token" in str(response.request.content) if hasattr(response, 'request') else False
+                    "captcha_used": captcha_used
                 }
                 results.append(result)
 
-                if response.status_code == 200:
+                if is_success:
                     success = True
                     time_to_crack = time.time() - start_time
                     correct_password = password

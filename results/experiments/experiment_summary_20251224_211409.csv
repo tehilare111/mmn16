@@ -1,0 +1,24 @@
+experiment_id,phase,config_description,hash_mode,rate_limit,lockout,captcha,pepper,totp,attack_type,target,target_category,success,total_attempts,time_to_crack,total_time_seconds,avg_latency_ms,attempts_per_second
+1,1,Phase 1: SHA256 - No protections,SHA256,False,False,False,False,False,brute_force,weak_user_01,weak,True,151,20.16,20.16,133.5,7.49
+2,1,Phase 1: SHA256 - No protections,SHA256,False,False,False,False,False,brute_force,medium_user_01,medium,True,311,41.97,41.97,134.94,7.41
+3,1,Phase 1: SHA256 - No protections,SHA256,False,False,False,False,False,brute_force,strong_user_01,strong,True,455,61.32,61.32,134.75,7.42
+7,1,Phase 1: BCRYPT - No protections,BCRYPT,False,False,False,False,False,brute_force,weak_user_01,weak,True,151,19.58,19.59,129.67,7.71
+8,1,Phase 1: BCRYPT - No protections,BCRYPT,False,False,False,False,False,brute_force,medium_user_01,medium,True,311,41.27,41.27,132.67,7.54
+9,1,Phase 1: BCRYPT - No protections,BCRYPT,False,False,False,False,False,brute_force,strong_user_01,strong,True,455,60.65,60.65,133.29,7.5
+13,1,Phase 1: ARGON2ID - No protections,ARGON2ID,False,False,False,False,False,brute_force,weak_user_01,weak,True,151,19.69,19.69,130.39,7.67
+14,1,Phase 1: ARGON2ID - No protections,ARGON2ID,False,False,False,False,False,brute_force,medium_user_01,medium,True,311,41.23,41.23,132.55,7.54
+15,1,Phase 1: ARGON2ID - No protections,ARGON2ID,False,False,False,False,False,brute_force,strong_user_01,strong,True,455,60.71,60.71,133.41,7.5
+19,2,Phase 2: ARGON2ID - PEPPER only,ARGON2ID,False,False,False,True,False,brute_force,weak_user_01,weak,True,151,20.07,20.07,132.9,7.52
+20,2,Phase 2: ARGON2ID - PEPPER only,ARGON2ID,False,False,False,True,False,brute_force,medium_user_01,medium,True,311,42.37,42.37,136.23,7.34
+21,2,Phase 2: ARGON2ID - PEPPER only,ARGON2ID,False,False,False,True,False,brute_force,strong_user_01,strong,True,455,63.57,63.57,139.69,7.16
+25,2,Phase 2: ARGON2ID - RATE_LIMIT only,ARGON2ID,True,False,False,False,False,brute_force,weak_user_01,weak,True,151,20.14,20.14,133.35,7.5
+26,2,Phase 2: ARGON2ID - RATE_LIMIT only,ARGON2ID,True,False,False,False,False,brute_force,medium_user_01,medium,True,311,42.13,42.13,135.44,7.38
+27,2,Phase 2: ARGON2ID - RATE_LIMIT only,ARGON2ID,True,False,False,False,False,brute_force,strong_user_01,strong,True,455,61.94,61.94,136.11,7.35
+31,2,Phase 2: ARGON2ID - LOCKOUT only,ARGON2ID,False,True,False,False,False,brute_force,weak_user_01,weak,True,151,19.94,19.94,132.03,7.57
+32,2,Phase 2: ARGON2ID - LOCKOUT only,ARGON2ID,False,True,False,False,False,brute_force,medium_user_01,medium,True,311,41.87,41.87,134.62,7.43
+33,2,Phase 2: ARGON2ID - LOCKOUT only,ARGON2ID,False,True,False,False,False,brute_force,strong_user_01,strong,True,455,64.38,64.38,141.48,7.07
+37,2,Phase 2: ARGON2ID - CAPTCHA only,ARGON2ID,False,False,True,False,False,brute_force,weak_user_01,weak,True,151,20.57,20.57,136.18,7.34
+38,2,Phase 2: ARGON2ID - CAPTCHA only,ARGON2ID,False,False,True,False,False,brute_force,medium_user_01,medium,True,311,42.31,42.31,136.02,7.35
+39,2,Phase 2: ARGON2ID - CAPTCHA only,ARGON2ID,False,False,True,False,False,brute_force,strong_user_01,strong,True,455,62.42,62.42,137.18,7.29
+43,2,Phase 2: ARGON2ID - TOTP only,ARGON2ID,False,False,False,False,True,brute_force,weak_user_01,weak,False,464,,0.46,0.97,1015.63
+49,2,Phase 2: ARGON2ID - ALL protections,ARGON2ID,True,True,True,True,True,brute_force,weak_user_01,weak,False,464,,0.45,0.97,1025.49

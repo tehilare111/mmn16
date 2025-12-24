@@ -1,0 +1,59 @@
+{
+  "total_experiments": 23,
+  "successful_attacks": 21,
+  "success_rate": 91.30434782608695,
+  "phase1_success": 9,
+  "phase1_total": 9,
+  "phase2_success": 12,
+  "phase2_total": 14,
+  "by_hash_mode": {
+    "SHA256": {
+      "total": 3,
+      "successful": 3,
+      "avg_time_to_crack": 41.15,
+      "avg_attempts": 305.6666666666667,
+      "avg_latency_ms": 134.39666666666668
+    },
+    "BCRYPT": {
+      "total": 3,
+      "successful": 3,
+      "avg_time_to_crack": 40.5,
+      "avg_attempts": 305.6666666666667,
+      "avg_latency_ms": 131.87666666666667
+    },
+    "ARGON2ID": {
+      "total": 17,
+      "successful": 15,
+      "avg_time_to_crack": 41.556000000000004,
+      "avg_attempts": 324.29411764705884,
+      "avg_latency_ms": 119.3835294117647
+    }
+  },
+  "by_category": {
+    "weak": {
+      "total": 9,
+      "successful": 7,
+      "avg_time_to_crack": 20.021428571428572,
+      "avg_attempts": 220.55555555555554
+    },
+    "medium": {
+      "total": 7,
+      "successful": 7,
+      "avg_time_to_crack": 41.878571428571426,
+      "avg_attempts": 311.0
+    },
+    "strong": {
+      "total": 7,
+      "successful": 7,
+      "avg_time_to_crack": 62.14142857142857,
+      "avg_attempts": 455.0
+    }
+  },
+  "by_attack_type": {
+    "brute_force": {
+      "total": 23,
+      "successful": 21,
+      "avg_time": 37.79173913043479
+    }
+  }
+}

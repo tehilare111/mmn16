@@ -1,0 +1,149 @@
+
+================================================================================
+Configuration 1/9: Phase 1: SHA256 - No protections
+Started at: 2025-12-24 20:41:41
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [1/54] brute_force - weak_user_01
+    Status: SUCCESS | Attempts: 151 | Time: 20.17s
+  [2/54] brute_force - medium_user_01
+    Status: SUCCESS | Attempts: 311 | Time: 41.98s
+  [3/54] brute_force - strong_user_01
+    Status: SUCCESS | Attempts: 455 | Time: 61.32s
+  [4/54] password_spraying - weak_group
+  [5/54] password_spraying - medium_group
+  [6/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 2/9: Phase 1: BCRYPT - No protections
+Started at: 2025-12-24 20:45:32
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [7/54] brute_force - weak_user_01
+    Status: SUCCESS | Attempts: 151 | Time: 19.59s
+  [8/54] brute_force - medium_user_01
+    Status: SUCCESS | Attempts: 311 | Time: 41.27s
+  [9/54] brute_force - strong_user_01
+    Status: SUCCESS | Attempts: 455 | Time: 60.66s
+  [10/54] password_spraying - weak_group
+  [11/54] password_spraying - medium_group
+  [12/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 3/9: Phase 1: ARGON2ID - No protections
+Started at: 2025-12-24 20:49:22
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [13/54] brute_force - weak_user_01
+    Status: SUCCESS | Attempts: 151 | Time: 19.70s
+  [14/54] brute_force - medium_user_01
+    Status: SUCCESS | Attempts: 311 | Time: 41.23s
+  [15/54] brute_force - strong_user_01
+    Status: SUCCESS | Attempts: 455 | Time: 60.71s
+  [16/54] password_spraying - weak_group
+  [17/54] password_spraying - medium_group
+  [18/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 4/9: Phase 2: ARGON2ID - PEPPER only
+Started at: 2025-12-24 20:53:11
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [19/54] brute_force - weak_user_01
+    Status: SUCCESS | Attempts: 151 | Time: 20.08s
+  [20/54] brute_force - medium_user_01
+    Status: SUCCESS | Attempts: 311 | Time: 42.38s
+  [21/54] brute_force - strong_user_01
+    Status: SUCCESS | Attempts: 455 | Time: 63.57s
+  [22/54] password_spraying - weak_group
+  [23/54] password_spraying - medium_group
+  [24/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 5/9: Phase 2: ARGON2ID - RATE_LIMIT only
+Started at: 2025-12-24 20:57:05
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [25/54] brute_force - weak_user_01
+    Status: SUCCESS | Attempts: 151 | Time: 20.14s
+  [26/54] brute_force - medium_user_01
+    Status: SUCCESS | Attempts: 311 | Time: 42.13s
+  [27/54] brute_force - strong_user_01
+    Status: SUCCESS | Attempts: 455 | Time: 61.94s
+  [28/54] password_spraying - weak_group
+  [29/54] password_spraying - medium_group
+  [30/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 6/9: Phase 2: ARGON2ID - LOCKOUT only
+Started at: 2025-12-24 21:00:57
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [31/54] brute_force - weak_user_01
+    Status: SUCCESS | Attempts: 151 | Time: 19.94s
+  [32/54] brute_force - medium_user_01
+    Status: SUCCESS | Attempts: 311 | Time: 41.88s
+  [33/54] brute_force - strong_user_01
+    Status: SUCCESS | Attempts: 455 | Time: 64.38s
+  [34/54] password_spraying - weak_group
+  [35/54] password_spraying - medium_group
+  [36/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 7/9: Phase 2: ARGON2ID - CAPTCHA only
+Started at: 2025-12-24 21:04:51
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [37/54] brute_force - weak_user_01
+    Status: SUCCESS | Attempts: 151 | Time: 20.57s
+  [38/54] brute_force - medium_user_01
+    Status: SUCCESS | Attempts: 311 | Time: 42.31s
+  [39/54] brute_force - strong_user_01
+    Status: SUCCESS | Attempts: 455 | Time: 62.43s
+  [40/54] password_spraying - weak_group
+  [41/54] password_spraying - medium_group
+  [42/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 8/9: Phase 2: ARGON2ID - TOTP only
+Started at: 2025-12-24 21:08:44
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [43/54] brute_force - weak_user_01
+    Status: FAILED | Attempts: 464 | Time: 0.46s
+  [44/54] brute_force - medium_user_01
+  [45/54] brute_force - strong_user_01
+  [46/54] password_spraying - weak_group
+  [47/54] password_spraying - medium_group
+  [48/54] password_spraying - strong_group
+Server stopped
+
+================================================================================
+Configuration 9/9: Phase 2: ARGON2ID - ALL protections
+Started at: 2025-12-24 21:11:27
+Updated .env file
+Server started successfully
+Users seeded successfully
+  [49/54] brute_force - weak_user_01
+    Status: FAILED | Attempts: 464 | Time: 0.46s
+  [50/54] brute_force - medium_user_01
+  [51/54] brute_force - strong_user_01
+  [52/54] password_spraying - weak_group
+  [53/54] password_spraying - medium_group
+  [54/54] password_spraying - strong_group
+Server stopped
