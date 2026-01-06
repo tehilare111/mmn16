@@ -1,0 +1,41 @@
+{
+  "attack_type": "brute_force",
+  "target_username": "strong_user_01",
+  "password_category": "strong",
+  "hash_mode": "SHA256",
+  "protection_flags": {
+    "rate_limit": true,
+    "lockout": true,
+    "captcha": true,
+    "pepper": true,
+    "totp": true
+  },
+  "success": false,
+  "total_attempts": 1,
+  "time_to_crack": null,
+  "total_time_seconds": 0.15801167488098145,
+  "avg_latency_ms": 158.0117801601545,
+  "attempts_per_second": 6.328646289922731,
+  "group_seed": 1170596,
+  "timestamp": 1767729000,
+  "attempts": [
+    {
+      "attempt": 1,
+      "timestamp": 1767729000,
+      "group_seed": 1170596,
+      "username": "strong_user_01",
+      "password": "password_1",
+      "password_category": "unknown",
+      "hash_mode": "SHA256",
+      "rate_limit": true,
+      "lockout": true,
+      "captcha": true,
+      "pepper": true,
+      "totp": true,
+      "status_code": 403,
+      "success": false,
+      "latency_ms": 158.0117801601545,
+      "error": "CAPTCHA verification failed"
+    }
+  ]
+}

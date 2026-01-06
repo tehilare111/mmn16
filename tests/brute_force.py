@@ -18,7 +18,7 @@ from tests.reporting import (
 
 # Constants
 DEFAULT_RATE_LIMIT_DELAY: float = 0.0
-COMMON_PASSWORDS_FILE: str = "data/common_passwords.txt"
+COMMON_PASSWORDS_FILE: str = "data/mid_common_passwords.txt"
 
 
 # Load common password list
@@ -74,7 +74,8 @@ async def brute_force_attack(
     time_to_crack = None
     start_time = time.time()
 
-    async with httpx.AsyncClient(timeout=HTTP_CLIENT_TIMEOUT_SECONDS) as client:
+    timeout = httpx.Timeout(HTTP_CLIENT_TIMEOUT_SECONDS, read=HTTP_CLIENT_TIMEOUT_SECONDS)
+    async with httpx.AsyncClient(timeout=timeout) as client:
         for idx, password in enumerate(passwords_to_try, 1):
             password_category = "unknown"
             for user, pwd in USER_PASSWORDS.items():
@@ -83,7 +84,7 @@ async def brute_force_attack(
                     break
 
             payload = {"username": target_username, "password": password}
-            if TOTP_ENABLED:
+            if protection_flags["totp"]:
                 secret = USER_SECRETS.get(target_username)
                 if secret:
                     payload["totp_code"] = pyotp.TOTP(secret).now()

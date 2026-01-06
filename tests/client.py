@@ -3,8 +3,8 @@ from typing import Optional
 import httpx
 
 
-# Constants
-HTTP_CLIENT_TIMEOUT_SECONDS: float = 30.0
+# Constants - increased timeout for slow hash algorithms like bcrypt
+HTTP_CLIENT_TIMEOUT_SECONDS: float = 60.0
 MAX_RETRY_ATTEMPTS: int = 3
 RETRY_BACKOFF_BASE: int = 5  # seconds, used for exponential backoff
 
