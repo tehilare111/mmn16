@@ -18,7 +18,7 @@ from tests.reporting import (
 
 PASSWORD_SPRAYING_TIMEOUT_SECONDS: float = 120.0
 DEFAULT_RATE_LIMIT_DELAY: float = 0.0
-COMMON_PASSWORDS_FILE: str = "data/common_passwords_test.txt"
+COMMON_PASSWORDS_FILE: str = "data/mid_common_passwords.txt"
 
 
 # Load common password list
@@ -68,7 +68,8 @@ async def password_spraying_attack(
     start_time = time.time()
     attempt_counter = 0
 
-    async with httpx.AsyncClient(timeout=PASSWORD_SPRAYING_TIMEOUT_SECONDS) as client:
+    timeout = httpx.Timeout(PASSWORD_SPRAYING_TIMEOUT_SECONDS, read=PASSWORD_SPRAYING_TIMEOUT_SECONDS)
+    async with httpx.AsyncClient(timeout=timeout) as client:
         for idx, password in enumerate(passwords_to_try, 1):
             if success:
                 break
@@ -82,7 +83,7 @@ async def password_spraying_attack(
                         break
 
                 payload = {"username": username, "password": password}
-                if TOTP_ENABLED:
+                if protection_flags["totp"]:
                     secret = USER_SECRETS.get(username)
                     if secret:
                         payload["totp_code"] = pyotp.TOTP(secret).now()
