@@ -1,0 +1,2 @@
+attempt,timestamp,group_seed,username,password,password_category,hash_mode,rate_limit,lockout,captcha,pepper,totp,status_code,success,latency_ms,error
+1,1767728000,1170596,strong_user_01,password_1,unknown,SHA256,False,True,True,False,False,403,False,159.669427728472,CAPTCHA verification failed

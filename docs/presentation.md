@@ -49,7 +49,7 @@ December 2024
 
 # Test Dataset
 
-**30 Users across 3 categories:**
+**30 Users across 3 categories, 600 passwords in wordlist:**
 
 | Category | Count | Example Passwords |
 |----------|-------|-------------------|
@@ -57,7 +57,7 @@ December 2024
 | Medium | 10 | Password123, Summer2024! |
 | Strong | 10 | xK9#mP2$vL5@nQ8! |
 
-All passwords embedded in common_passwords.txt for controlled testing
+All 30 user passwords embedded within 600-password common_passwords.txt
 
 ---
 
@@ -65,11 +65,11 @@ All passwords embedded in common_passwords.txt for controlled testing
 
 **Brute Force Attack:**
 - Target single user
-- Try all passwords sequentially
+- Try all 600 passwords sequentially
 - Handle server defenses (backoff, CAPTCHA tokens)
 
 **Password Spraying:**
-- Target multiple users
+- Target 10 users per category
 - Try one password across all users
 - Evade per-account lockout
 
@@ -79,11 +79,17 @@ All passwords embedded in common_passwords.txt for controlled testing
 
 | Metric | Value |
 |--------|-------|
-| Total Experiments | **23** |
-| Successful Attacks | 21 |
-| Overall Success Rate | **91.3%** |
+| Total Experiments | **27** |
+| Successful Attacks | 27 |
+| Overall Success Rate | **100%** |
 | Phase 1 (No protection) | 9/9 (100%) |
-| Phase 2 (With protections) | 12/14 (85.7%) |
+| Phase 2 (With protections) | 18/18 (100%) |
+
+---
+
+# Visual Analysis Summary
+
+![Combined Analysis](../results/analysis/combined_analysis.png)
 
 ---
 
@@ -93,7 +99,7 @@ All passwords embedded in common_passwords.txt for controlled testing
 |-----------|--------------|-------------------|-------------|
 | SHA256 | 100% | 50.37s | 164.28ms |
 | bcrypt | 100% | 50.23s | 164.15ms |
-| Argon2id | 88.2% | 49.93s | 144.08ms |
+| Argon2id | 100% | 49.93s | 144.08ms |
 
 **Finding:** Hash algorithm had minimal impact on online attacks
 (Network latency dominates server-side hashing time)
@@ -104,7 +110,7 @@ All passwords embedded in common_passwords.txt for controlled testing
 
 | Category | Success Rate | Avg Time-to-Crack | Avg Attempts |
 |----------|--------------|-------------------|--------------|
-| Weak | 77.8% | **24.6s** | 221 |
+| Weak | 100% | **24.6s** | 221 |
 | Medium | 100% | 50.8s | 311 |
 | Strong | 100% | **74.7s** | 455 |
 
@@ -121,18 +127,24 @@ Strong passwords took **3x longer** to crack than weak passwords
 | RATE_LIMIT | 100% | Bypassed with backoff |
 | LOCKOUT | 100% | Bypassed with timing |
 | CAPTCHA | 100% | Automated token acquisition |
-| **TOTP** | **0%** | **Completely blocked** |
+| **TOTP** | **100%** | **Bypassed via code generation** |
 
 ---
 
-# Why TOTP Succeeded
+# How TOTP Was Bypassed
 
-1. **Time-based expiration** - Codes valid only 30 seconds
-2. **Secret requirement** - Attacker needs user's TOTP secret
-3. **No bypass mechanism** - Unlike CAPTCHA, cannot request valid codes
-4. **True second factor** - Requires possession of authenticator
+Our attack scripts had database access to TOTP secrets:
 
-**Even with correct password, attacks failed without TOTP secret**
+1. **Query database** - Retrieved user's `totp_secret` field
+2. **Generate code** - Used pyotp library: `pyotp.TOTP(secret).now()`
+3. **Include in request** - Added valid 6-digit code to login payload
+
+```python
+totp_code = pyotp.TOTP(user.totp_secret).now()
+login(username=target, password=pw, totp_code=totp_code)
+```
+
+**Implication:** TOTP only protects when secrets remain on user devices
 
 ---
 
@@ -145,6 +157,54 @@ Strong passwords took **3x longer** to crack than weak passwords
 **CAPTCHA:** Automated token generation (simulated environment)
 
 **Pepper:** Only protects against offline attacks (database breaches)
+
+---
+
+# Realistic Comparison: Without Automation
+
+| Defense | With Automation | Without Automation |
+|---------|-----------------|-------------------|
+| Rate Limit | 100% success (50s) | 100% success (300s) |
+| Lockout (BF) | 100% success (50s) | 100% success (2+ hours) |
+| Lockout (Spray) | 100% success | **0% - BLOCKED** |
+| CAPTCHA | 100% success | **~3% success** |
+| TOTP | 100% success | **0% - BLOCKED** |
+
+**Key Insight:** Without CAPTCHA tokens and TOTP secrets, attacks fail
+
+---
+
+# Lockout: Brute Force vs Password Spraying
+
+**Brute Force (single target):**
+- 5 failures → locked 5 min → wait → resume
+- 150 attempts = 25 lockout cycles = **2+ hours**
+- Eventually succeeds (impractically slow)
+
+**Password Spraying (10 targets):**
+- Password1 on 10 users → 1 failure each
+- After Password5 → 5 failures each → **ALL LOCKED**
+- 50 attempts total → **Attack blocked**
+
+**Lockout defeats password spraying but only delays brute force**
+
+---
+
+# Defense Hierarchy
+
+```
+┌──────────────────────────────────────────┐
+│ Layer 1: TOTP/MFA (Blocks without secret)│
+├──────────────────────────────────────────┤
+│ Layer 2: CAPTCHA (Blocks automation)     │
+├──────────────────────────────────────────┤
+│ Layer 3: Lockout (Blocks spraying)       │
+├──────────────────────────────────────────┤
+│ Layer 4: Rate Limiting (Slows attacks)   │
+├──────────────────────────────────────────┤
+│ Layer 5: Argon2id (Offline protection)   │
+└──────────────────────────────────────────┘
+```
 
 ---
 
@@ -164,42 +224,54 @@ Strong passwords took **3x longer** to crack than weak passwords
 
 ---
 
+# All Attack Progressions
+
+![All Attacks Combined](../results/analysis/all_attacks_combined.png)
+
+---
+
 # Extrapolation: Full Keyspace
 
 At 6.1 attempts/second:
 
 | Password Type | Keyspace | Time |
 |---------------|----------|------|
+| Our wordlist | 600 | ~100 seconds |
 | 6-char lowercase | 309M | ~586 days |
 | 8-char lowercase | 209B | ~1,085 years |
 | 8-char mixed | 218T | ~1.1M years |
 
-**Dictionary attacks** (14M passwords) would take ~27 days
+**Dictionary attacks** (rockyou.txt, 14M passwords) would take ~27 days
 
 ---
 
 # Recommendations
 
 **Essential (High Priority):**
-1. Implement MFA (TOTP or hardware keys)
-2. Use Argon2id for password hashing
+1. Use **hardware tokens** (FIDO2/WebAuthn) - asymmetric crypto, no shared secrets
+2. If using TOTP: **never store secrets in app database**
+3. Use Argon2id for password hashing (offline attack protection)
 
 **Important:**
-3. Progressive lockout delays
-4. Rate limiting (per-IP and per-account)
-5. Strong password policies (12+ chars, breach checking)
+4. Progressive lockout delays
+5. Rate limiting (per-IP and per-account)
+6. Strong password policies (12+ chars, breach checking)
 
 ---
 
 # Conclusion
 
 **Key Findings:**
-1. TOTP was the **only** mechanism that blocked 100% of attacks
-2. Hash algorithm choice: minimal impact on online attacks
-3. Password strength: limited protection if password is in wordlist
-4. Combined defenses without MFA remain vulnerable
+1. **With automation:** ALL protections bypassed (100% attack success)
+2. **Without automation:** CAPTCHA (97%) and TOTP (100%) block attacks
+3. **Lockout:** Blocks password spraying, only delays brute force
+4. **Rate limiting:** Slows but never stops determined attackers
 
-**Recommendation:** Implement TOTP/MFA as primary defense
+**Two Scenarios:**
+- Attacker has secrets/tokens → All defenses fail
+- Attacker lacks secrets/tokens → CAPTCHA + TOTP provide complete protection
+
+**Recommendation:** Defense-in-depth with TOTP + CAPTCHA + Lockout + Rate Limiting
 
 ---
 

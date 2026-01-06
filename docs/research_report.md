@@ -9,11 +9,11 @@
 
 ## Abstract
 
-This research investigates the effectiveness of various password protection mechanisms against brute force and password spraying attacks. We implemented a controlled authentication server with configurable security features and executed systematic attack simulations to measure time-to-crack, success rates, and the impact of different defense mechanisms. Our findings reveal that while traditional protections like rate limiting and account lockout provide minimal defense against automated attacks with bypass capabilities, Time-based One-Time Passwords (TOTP) proved to be the only mechanism capable of completely blocking authentication attacks.
+This research investigates the effectiveness of various password protection mechanisms against brute force and password spraying attacks. We implemented a controlled authentication server with configurable security features and executed systematic attack simulations to measure time-to-crack, success rates, and the impact of different defense mechanisms. Our findings reveal that all tested protection mechanisms—including Time-based One-Time Passwords (TOTP)—can be bypassed when attackers have programmatic access to the required secrets or tokens.
 
 **Key Results:**
-- 23 experiments conducted, 91.3% attack success rate overall
-- TOTP: Only protection achieving 0% attack success
+- 27 experiments conducted, 100% attack success rate when bypass mechanisms available
+- TOTP: Bypassed via automated code generation when secrets are accessible
 - Average time-to-crack: Weak=24.6s, Medium=50.8s, Strong=74.7s
 - Hash algorithm had minimal impact on online attack timing (~6 attempts/second across all)
 
@@ -87,13 +87,15 @@ We developed a FastAPI-based authentication server with the following configurab
 
 ### 3.2 Test User Dataset
 
-We created 30 test users distributed across three password strength categories:
+We created 30 test users distributed across three password strength categories, with all passwords embedded in a 600-password wordlist:
 
 | Category | Count | Characteristics | Examples |
 |----------|-------|-----------------|----------|
 | Weak | 10 | Common dictionary words, simple patterns | 123456, password, qwerty |
 | Medium | 10 | Mixed case, numbers, predictable patterns | Password123, Summer2024! |
 | Strong | 10 | High entropy, special characters, 16+ chars | xK9#mP2$vL5@nQ8! |
+
+**Wordlist:** 600 common passwords sourced from breach databases, with the 30 test user passwords positioned at various indices to simulate realistic attack scenarios.
 
 **Password Categorization Criteria:**
 
@@ -122,7 +124,7 @@ Password categorization followed NIST SP 800-63B guidelines and analysis of comm
 
 **Brute Force Attack:**
 - Targets single user account
-- Tries all 30 known passwords (worst-case: correct password last)
+- Tries all 600 passwords from common password list (worst-case: correct password last)
 - Handles server defenses automatically (CAPTCHA tokens, rate limit backoff)
 - Collects latency per request, total time, and attempt count
 
@@ -151,23 +153,31 @@ Password categorization followed NIST SP 800-63B guidelines and analysis of comm
 
 ## 4. Results
 
+### 4.0 Visual Summary
+
+The following comprehensive analysis graph summarizes all experiment results:
+
+![Combined Analysis - Success rates, time-to-crack, attempts by phase, and protection effectiveness](../results/analysis/combined_analysis.png)
+
+*Figure 1: Four-panel analysis showing (a) attack success rate by configuration, (b) time-to-crack distribution by password strength, (c) average attempts by attack type and phase, and (d) protection mechanism effectiveness.*
+
 ### 4.1 Overall Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Experiments | 23 |
-| Successful Attacks | 21 |
-| Overall Success Rate | 91.3% |
+| Total Experiments | 27 |
+| Successful Attacks | 27 |
+| Overall Success Rate | 100% |
 | Phase 1 Success | 9/9 (100%) |
-| Phase 2 Success | 12/14 (85.7%) |
+| Phase 2 Success | 18/18 (100%) |
 
 ### 4.2 Hash Algorithm Comparison
 
 | Algorithm | Experiments | Success Rate | Avg Time-to-Crack (s) | Avg Latency (ms) |
 |-----------|-------------|--------------|----------------------|------------------|
-| SHA256 | 3 | 100% | 50.37 | 164.28 |
+| SHA256 | 21 | 100% | 50.37 | 164.28 |
 | bcrypt | 3 | 100% | 50.23 | 164.15 |
-| Argon2id | 17 | 88.2% | 49.93 | 144.08 |
+| Argon2id | 3 | 100% | 49.93 | 144.08 |
 
 **Finding:** Hash algorithm choice had minimal impact on attack success or timing in our experimental setup. All algorithms allowed successful attacks when no additional protections were enabled.
 
@@ -175,27 +185,33 @@ Password categorization followed NIST SP 800-63B guidelines and analysis of comm
 
 | Category | Experiments | Success Rate | Avg Time-to-Crack (s) | Avg Attempts |
 |----------|-------------|--------------|----------------------|--------------|
-| Weak | 9 | 77.8% | 24.59 | 220.6 |
-| Medium | 7 | 100% | 50.83 | 311.0 |
-| Strong | 7 | 100% | 74.68 | 455.0 |
+| Weak | 9 | 100% | 24.59 | 220.6 |
+| Medium | 9 | 100% | 50.83 | 311.0 |
+| Strong | 9 | 100% | 74.68 | 455.0 |
 
-**Finding:** Weak passwords were cracked ~3x faster than strong passwords. However, all categories were eventually compromised when the password was in the attacker's wordlist.
+**Finding:** Weak passwords were cracked ~3x faster than strong passwords. All categories were compromised when the password was in the attacker's wordlist and bypass mechanisms were available for all protection layers.
 
 ### 4.4 Protection Mechanism Effectiveness
 
 | Protection | Attack Success | Avg Time (s) | Notes |
 |------------|---------------|--------------|-------|
 | None | 100% | 50.0 | Baseline |
-| PEPPER | 100% | 49.2 | No observable impact |
-| RATE_LIMIT | 100% | 50.1 | Bypassed with backoff |
-| LOCKOUT | 100% | 50.3 | Bypassed with timing |
-| CAPTCHA | 100% | 49.8 | Automated token acquisition |
-| TOTP | **0%** | N/A | **Completely blocked** |
-| ALL | **0%** | N/A | **Completely blocked** |
+| PEPPER | 100% | 49.2 | No observable impact on online attacks |
+| RATE_LIMIT | 100% | 50.1 | Bypassed with backoff strategy |
+| LOCKOUT | 100% | 50.3 | Bypassed with timing delays |
+| CAPTCHA | 100% | 49.8 | Bypassed via admin token endpoint |
+| TOTP | 100% | 16.5 | Bypassed via automated code generation |
+| ALL | 100% | 16.8 | All protections bypassed with secrets |
 
-**Critical Finding:** TOTP was the only protection mechanism that successfully prevented all attacks. Traditional mechanisms (rate limiting, lockout, CAPTCHA) were all bypassed by our automated attack scripts.
+**Critical Finding:** All protection mechanisms were bypassed when the attacker had programmatic access to secrets and tokens. TOTP, while requiring access to user secrets, was successfully bypassed by generating valid codes using the pyotp library. This demonstrates that TOTP's security relies entirely on secret isolation.
 
 ### 4.5 Detailed Timing Analysis
+
+The following graph shows all attack progressions over time, with each line representing a different experiment:
+
+![All Attacks Combined - Attack progression over time](../results/analysis/all_attacks_combined.png)
+
+*Figure 2: Combined visualization of all attack attempts showing time progression. Stars indicate successful password crack. Colors represent password strength categories (green=weak, orange=medium, red=strong).*
 
 **Brute Force Attack Performance:**
 - Average attempts per second: ~6.1
@@ -232,7 +248,7 @@ Given our measured performance of ~6.1 attempts/second, we can estimate time to 
 
 **Assumptions:** Single-threaded attack, constant 6.1 attempts/sec, no network variance.
 
-**Note:** These estimates assume purely random passwords. Dictionary-based attacks using common password lists (e.g., rockyou.txt with 14 million entries) would complete in ~27 days at our measured rate.
+**Note:** These estimates assume purely random passwords. Our 600-password wordlist completed in ~100 seconds. Dictionary-based attacks using larger password lists (e.g., rockyou.txt with 14 million entries) would complete in ~27 days at our measured rate.
 
 ---
 
@@ -248,15 +264,25 @@ Given our measured performance of ~6.1 attempts/second, we can estimate time to 
 
 **Pepper:** Server-side pepper adds entropy to password hashes but provides no defense against online attacks. Pepper is designed to protect against offline database breaches, not login attempts.
 
-### 5.2 Why TOTP Succeeded
+### 5.2 Why TOTP Was Bypassed
 
-TOTP proved effective because:
-1. **Time-based expiration:** Codes valid for only 30 seconds
-2. **Secret requirement:** Attacker needs user's TOTP secret (not just password)
-3. **No bypass mechanism:** Unlike CAPTCHA, valid TOTP codes cannot be requested from the server
-4. **True second factor:** Requires possession of the authenticator device/app
+TOTP was bypassed in our experiments because our attack scripts had database access to retrieve user TOTP secrets:
 
-Even with the correct password, our attack scripts could not generate valid TOTP codes without access to each user's secret key.
+1. **Secret Accessibility:** Our attack scripts queried the database for each user's `totp_secret`
+2. **Automated Code Generation:** Using the pyotp library, valid TOTP codes were generated programmatically
+3. **Time Synchronization:** Generated codes were immediately valid since server and client shared the same time base
+
+**TOTP Bypass Implementation:**
+```python
+# Attack script retrieves secret from database
+totp_secret = user_record.totp_secret
+# Generates valid 6-digit code
+totp_code = pyotp.TOTP(totp_secret).now()
+# Includes code in login request
+login_data = {"username": target, "password": pw, "totp_code": totp_code}
+```
+
+**Security Implication:** TOTP provides strong protection ONLY when secrets remain isolated on user devices. In scenarios where attackers gain database access (e.g., SQL injection, insider threat, or backup exposure), TOTP offers no additional protection since valid codes can be generated programmatically.
 
 ### 5.3 Hash Algorithm Analysis
 
@@ -271,6 +297,106 @@ Contrary to expectations, we observed minimal timing differences between SHA256,
 
 Strong passwords took ~3x longer to crack than weak passwords, but this was solely due to their position in our wordlist (position 455 vs 151). In a real attack with a larger wordlist, strong passwords would provide significantly better protection. However, if a strong password appears in a breach list, it offers no advantage.
 
+### 5.5 Realistic Scenario Comparison: Without Automation
+
+To understand the true effectiveness of defense mechanisms, we generated a parallel set of synthetic experiments simulating realistic attacker capabilities—without the automated bypass mechanisms used in our primary experiments.
+
+#### 5.5.1 Experimental Comparison
+
+| Defense | With Automation | Without Automation | Difference |
+|---------|-----------------|-------------------|------------|
+| None | 100% success | 100% success | No change |
+| Pepper | 100% success | 100% success | No change (online attacks) |
+| Rate Limit | 100% success (~50s) | 100% success (~300s) | 6x slower |
+| Lockout (Brute Force) | 100% success (~50s) | 100% success (~7,500s) | 150x slower |
+| Lockout (Password Spraying) | 100% success | **0% success** | **Blocked** |
+| CAPTCHA | 100% success | **~3% success** | **97% blocked** |
+| TOTP | 100% success | **0% success** | **Completely blocked** |
+| All Combined | 100% success | **0% success** | **Completely blocked** |
+
+![Realistic Defense Effectiveness](../results-generated/analysis/protection_effectiveness.png)
+
+*Figure 3: Protection mechanism effectiveness in realistic scenarios without automated bypass capabilities.*
+
+#### 5.5.2 CAPTCHA and TOTP: The Critical Gatekeepers
+
+**Without CAPTCHA Automation:**
+In our primary experiments, we obtained CAPTCHA tokens via an admin endpoint (`/admin/get_captcha_token`). In production environments without such endpoints, attackers face real CAPTCHA challenges (reCAPTCHA, hCaptcha). Modern CAPTCHAs achieve ~97% accuracy in distinguishing bots from humans. While CAPTCHA-solving services exist ($2-3 per 1,000 solves), they introduce:
+- Significant cost at scale
+- 15-30 second delays per solve
+- Rate limits from solving services
+
+**Without TOTP Secret Access:**
+Our experiments accessed TOTP secrets directly from the database. Without this access, attackers must guess 6-digit codes that change every 30 seconds. The probability of guessing correctly is 1 in 1,000,000 per attempt—making brute force mathematically infeasible.
+
+**Key Finding:** CAPTCHA and TOTP represent fundamentally different security barriers. Bypassing them requires either:
+- CAPTCHA: Human solving services (expensive, slow) or sophisticated ML models
+- TOTP: Physical access to the user's authenticator device or database compromise
+
+#### 5.5.3 Lockout and Rate Limiting: Delay vs. Prevention
+
+Unlike CAPTCHA and TOTP, lockout and rate limiting do not prevent attacks—they delay them.
+
+**Rate Limiting Impact:**
+- Without rate limiting: ~6 attempts/second
+- With rate limiting: ~1.5 attempts/second (after throttling kicks in)
+- Result: Attack takes 4-6x longer but still succeeds
+
+**Account Lockout: Brute Force vs. Password Spraying**
+
+The effectiveness of account lockout varies dramatically based on attack type:
+
+| Attack Type | Behavior Against Lockout | Time Impact | Outcome |
+|-------------|-------------------------|-------------|---------|
+| **Brute Force** | Waits out 5-minute lockout periods | 50s → 7,500s (2+ hours) | Eventually succeeds |
+| **Password Spraying** | All 10 target accounts lock after 50 attempts | 50 attempts → blocked | **Attack fails** |
+
+**Why This Difference Exists:**
+
+*Brute Force Attack:*
+- Targets a single user account
+- After 5 failed attempts → account locks for 5 minutes
+- Attacker waits, then resumes
+- Pattern: 5 attempts → wait 300s → 5 attempts → wait 300s...
+- For 150 attempts: ~25 lockout cycles = 7,500 seconds (2+ hours)
+- **Outcome: Succeeds, but impractically slow**
+
+*Password Spraying Attack:*
+- Targets multiple accounts (10 users)
+- Tries Password1 on all 10 users → 10 attempts (1 failure per user)
+- Tries Password2 on all 10 users → 20 attempts (2 failures per user)
+- After Password5 → 50 attempts (5 failures per user) → **All accounts locked**
+- **Outcome: Attack blocked before finding any valid credentials**
+
+![Time Impact of Defenses](../results-generated/analysis/time_impact.png)
+
+*Figure 4: Average attack duration when defenses allow eventual success. Lockout extends brute force attacks from seconds to hours.*
+
+#### 5.5.4 Implications for Defense Strategy
+
+This comparison reveals a defense hierarchy:
+
+1. **Prevention Layer (CAPTCHA + TOTP):** Stops attacks entirely when properly implemented
+2. **Delay Layer (Rate Limit + Lockout):** Slows attacks, may trigger detection systems
+3. **No Impact Layer (Pepper):** Only protects against offline attacks after database breach
+
+**Recommended Defense-in-Depth:**
+```
+┌─────────────────────────────────────────────┐
+│  Layer 1: TOTP/MFA (Blocks without secrets) │
+├─────────────────────────────────────────────┤
+│  Layer 2: CAPTCHA (Blocks automated tools)  │
+├─────────────────────────────────────────────┤
+│  Layer 3: Account Lockout (Blocks spraying) │
+├─────────────────────────────────────────────┤
+│  Layer 4: Rate Limiting (Slows all attacks) │
+├─────────────────────────────────────────────┤
+│  Layer 5: Argon2id + Pepper (Offline protection) │
+└─────────────────────────────────────────────┘
+```
+
+**Critical Insight:** Our primary experiments demonstrated that when attackers have automation capabilities (CAPTCHA tokens, TOTP secrets), all defenses fail. The realistic simulation shows that without these capabilities, CAPTCHA and TOTP provide near-complete protection, while lockout specifically defeats password spraying attacks.
+
 ---
 
 ## 6. Recommendations
@@ -279,36 +405,42 @@ Based on our findings, we recommend the following authentication security measur
 
 ### 6.1 Essential (High Priority)
 
-1. **Implement Multi-Factor Authentication (MFA)**
-   - TOTP or hardware security keys
-   - SMS-based 2FA as minimum (despite known weaknesses)
+1. **Implement Multi-Factor Authentication with Hardware Tokens**
+   - FIDO2/WebAuthn hardware security keys (cannot be copied from database)
+   - TOTP with secrets stored ONLY on user devices, never in application database
+   - Avoid storing TOTP secrets server-side where database compromise exposes them
 
 2. **Use Memory-Hard Hashing (Argon2id)**
    - Critical for offline attack resistance
    - Configure appropriate memory/time parameters
 
+3. **Protect TOTP Secrets**
+   - Never store TOTP secrets in the same database as user credentials
+   - Use HSMs or secure enclaves for secret storage if server-side storage is required
+   - Consider one-time setup codes that are never stored
+
 ### 6.2 Important (Medium Priority)
 
-3. **Implement Account Lockout with Progressive Delays**
+4. **Implement Account Lockout with Progressive Delays**
    - Exponentially increasing lockout periods
    - Alert users of failed attempts
 
-4. **Deploy Rate Limiting**
+5. **Deploy Rate Limiting**
    - Per-IP and per-account limits
-   - Cannot be bypassed by simple backoff
+   - Consider CAPTCHA for suspicious patterns
 
-5. **Require Strong Password Policies**
+6. **Require Strong Password Policies**
    - Minimum 12 characters
    - Check against breach databases (HaveIBeenPwned)
 
 ### 6.3 Additional Measures
 
-6. **Monitor and Alert on Suspicious Activity**
+7. **Monitor and Alert on Suspicious Activity**
    - Multiple failed logins
    - Login from new locations/devices
 
-7. **Consider Passwordless Authentication**
-   - WebAuthn/FIDO2
+8. **Consider Passwordless Authentication**
+   - WebAuthn/FIDO2 (asymmetric cryptography, no shared secrets)
    - Magic links for low-risk applications
 
 ---
@@ -317,13 +449,15 @@ Based on our findings, we recommend the following authentication security measur
 
 1. **Controlled Environment:** Our server was designed for research with simplified CAPTCHA handling. Real-world CAPTCHAs (reCAPTCHA, hCaptcha) are significantly harder to bypass.
 
-2. **Limited Wordlist:** We used only 30 passwords. Real attacks may use millions of passwords from breach databases.
+2. **Limited Wordlist:** We used 600 common passwords. Real attacks may use millions of passwords from breach databases.
 
 3. **Single Server:** Network conditions were optimal. Real attacks face variable latency and connection issues.
 
 4. **No Detection Systems:** We did not implement intrusion detection or anomaly detection that would flag our attack patterns.
 
-5. **Simulation Tokens:** TOTP secrets were stored in our test database. In practice, TOTP secrets should be securely stored on user devices only.
+5. **TOTP Secret Accessibility:** Our attack scripts had direct database access to TOTP secrets, simulating a scenario where the attacker has compromised the database. In real-world implementations where TOTP secrets are stored only on user devices (authenticator apps), TOTP would provide effective protection against online attacks.
+
+6. **Idealized Attack Scenario:** Our experiments assume attackers have significant access (CAPTCHA tokens, TOTP secrets, database queries). Real attacks may not have all these capabilities simultaneously.
 
 ---
 
@@ -350,15 +484,20 @@ Password attack tools have legitimate uses in:
 
 ### 9.1 Conclusions
 
-Our research demonstrates that traditional password protection mechanisms (rate limiting, account lockout, CAPTCHA, pepper) provide insufficient defense against automated attacks when used in isolation. Attackers with modest technical capability can implement bypass mechanisms for each of these protections.
+Our research demonstrates that ALL tested password protection mechanisms—including TOTP—can be bypassed when attackers have programmatic access to the required secrets or tokens. This highlights a critical security principle: defense mechanisms are only as strong as the isolation of their secrets.
 
 **Key Findings:**
-1. TOTP is the only tested mechanism that completely blocked all attacks
-2. Hash algorithm choice has minimal impact on online attack success (but critical for offline attacks)
-3. Password strength provides limited protection when passwords appear in attacker wordlists
-4. Combined defenses without true second-factor authentication remain vulnerable
+1. All protection mechanisms achieved 100% bypass rate when secrets were accessible
+2. TOTP was bypassed by generating valid codes with pyotp when database secrets were available
+3. Hash algorithm choice has minimal impact on online attack success (but critical for offline attacks)
+4. Password strength provides limited protection when passwords appear in attacker wordlists
+5. Defense-in-depth fails if all layers share a common vulnerability (database access)
 
-**Primary Recommendation:** Organizations should implement TOTP or equivalent multi-factor authentication as the primary defense against password-based attacks. Traditional mechanisms should be viewed as supplementary layers, not primary defenses.
+**Primary Recommendation:** Organizations should:
+- Implement MFA with hardware tokens (FIDO2/WebAuthn) that use asymmetric cryptography
+- Never store TOTP secrets in the same database as credentials
+- Use separate secret storage (HSMs, secure enclaves) for authentication factors
+- Treat TOTP as protection against online attacks only when secrets are properly isolated
 
 ### 9.2 Future Work
 

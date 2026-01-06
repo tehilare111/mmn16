@@ -1,0 +1,41 @@
+{
+  "attack_type": "brute_force",
+  "target_username": "medium_user_01",
+  "password_category": "medium",
+  "hash_mode": "ARGON2ID",
+  "protection_flags": {
+    "rate_limit": false,
+    "lockout": false,
+    "captcha": true,
+    "pepper": false,
+    "totp": false
+  },
+  "success": false,
+  "total_attempts": 1,
+  "time_to_crack": null,
+  "total_time_seconds": 0.2717862129211426,
+  "avg_latency_ms": 271.7863000879743,
+  "attempts_per_second": 3.6793625005921293,
+  "group_seed": 1170596,
+  "timestamp": 1767773000,
+  "attempts": [
+    {
+      "attempt": 1,
+      "timestamp": 1767773000,
+      "group_seed": 1170596,
+      "username": "medium_user_01",
+      "password": "password_1",
+      "password_category": "unknown",
+      "hash_mode": "ARGON2ID",
+      "rate_limit": false,
+      "lockout": false,
+      "captcha": true,
+      "pepper": false,
+      "totp": false,
+      "status_code": 403,
+      "success": false,
+      "latency_ms": 271.7863000879743,
+      "error": "CAPTCHA verification failed"
+    }
+  ]
+}

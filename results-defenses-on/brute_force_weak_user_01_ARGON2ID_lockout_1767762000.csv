@@ -1,0 +1,11 @@
+attempt,timestamp,group_seed,username,password,password_category,hash_mode,rate_limit,lockout,captcha,pepper,totp,status_code,success,latency_ms,error
+1,1767762000,1170596,weak_user_01,password_1,unknown,ARGON2ID,False,True,False,False,False,401,False,228.5380066246187,
+2,1767762000.228538,1170596,weak_user_01,password_2,unknown,ARGON2ID,False,True,False,False,False,401,False,228.42970776210984,
+3,1767762000.4569678,1170596,weak_user_01,password_3,unknown,ARGON2ID,False,True,False,False,False,401,False,281.63105051142185,
+4,1767762000.7385988,1170596,weak_user_01,password_4,unknown,ARGON2ID,False,True,False,False,False,401,False,240.5516064145741,
+5,1767762000.9791505,1170596,weak_user_01,password_5,unknown,ARGON2ID,False,True,False,False,False,401,False,284.67106824640155,
+7,1767762301.9791505,1170596,weak_user_01,password_7,unknown,ARGON2ID,False,True,False,False,False,401,False,276.71575098986875,
+8,1767762302.2558663,1170596,weak_user_01,password_8,unknown,ARGON2ID,False,True,False,False,False,401,False,241.0600192850249,
+9,1767762302.4969263,1170596,weak_user_01,password_9,unknown,ARGON2ID,False,True,False,False,False,401,False,223.62992513294466,
+10,1767762302.7205563,1170596,weak_user_01,password_10,unknown,ARGON2ID,False,True,False,False,False,401,False,226.34442166714186,
+11,1767762302.9469006,1170596,weak_user_01,correct_password_weak,weak,ARGON2ID,False,True,False,False,False,200,True,225.26440296324915,

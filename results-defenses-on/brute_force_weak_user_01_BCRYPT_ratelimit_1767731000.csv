@@ -1,0 +1,12 @@
+attempt,timestamp,group_seed,username,password,password_category,hash_mode,rate_limit,lockout,captcha,pepper,totp,status_code,success,latency_ms,error
+1,1767731000,1170596,weak_user_01,password_1,unknown,BCRYPT,True,False,False,False,False,401,False,315.15835042290075,
+2,1767731000.3151584,1170596,weak_user_01,password_2,unknown,BCRYPT,True,False,False,False,False,401,False,375.6188232164846,
+3,1767731000.6907773,1170596,weak_user_01,password_3,unknown,BCRYPT,True,False,False,False,False,401,False,387.4018081968704,
+4,1767731001.0781791,1170596,weak_user_01,password_4,unknown,BCRYPT,True,False,False,False,False,401,False,314.8046173330407,
+5,1767731001.3929837,1170596,weak_user_01,password_5,unknown,BCRYPT,True,False,False,False,False,401,False,381.35447001152556,
+6,1767731001.7743382,1170596,weak_user_01,password_6,unknown,BCRYPT,True,False,False,False,False,401,False,344.75315702071293,
+7,1767731002.1190915,1170596,weak_user_01,password_7,unknown,BCRYPT,True,False,False,False,False,401,False,315.91963449353136,
+8,1767731002.4350111,1170596,weak_user_01,password_8,unknown,BCRYPT,True,False,False,False,False,401,False,393.4688045733883,
+9,1767731002.82848,1170596,weak_user_01,password_9,unknown,BCRYPT,True,False,False,False,False,401,False,364.37084852018495,
+10,1767731003.1928508,1170596,weak_user_01,password_10,unknown,BCRYPT,True,False,False,False,False,401,False,388.5789137185166,
+11,1767731008.5814297,1170596,weak_user_01,correct_password_weak,weak,BCRYPT,True,False,False,False,False,200,True,370.47601523403966,
